@@ -1,17 +1,12 @@
 import pygame
-import math
+import sys
 from pygame.locals import *
 pygame.init()
 ## TODO ###
-# 
-# - Change square size to be determined when level created
-# - Flash screen message on final level 
+#
+# - Flash screen message on final level
 # - Menu
 # - High score
-#
-
-
-
 
 # GLOBALS
 BLACK = (0, 0, 0)
@@ -19,15 +14,10 @@ WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
-
-TOTAL_X = 700
-TOTAL_Y = 500
-
-SIZE = (TOTAL_X, TOTAL_Y)
+TOTAL_X = 800
+TOTAL_Y = 600
+SIZE = (TOTAL_X+50, TOTAL_Y+50)
 CAPTION = "This game"
-
-
-
 
 def load_level(filename):
 	with open(filename) as f:
@@ -77,22 +67,28 @@ class Board:
 		# 	print row
 	def make_level(self, levelnum):
 		#print 'length of self.levels : ' + str(len(self.levels[0]))
+
+		self.num_squares = len(self.levels[levelnum][0])
 		print 'Length of width: %s' % len(self.levels[levelnum][0])
-		print 'Square Width: %s' % str(TOTAL_X - 50)
+		print 'Length of height?: %s ' % len(self.levels[levelnum])
+		print '%s -- Total X' % TOTAL_X
+		print '%s -- Total X - 75' % (TOTAL_X - (5 * self.num_squares - 1))
+		print '/ %s -- Divided by # of squares in a row' % (len(self.levels[levelnum][0]))
+		print 'Square Width: %s' % str(round((TOTAL_X - (5 * self.num_squares - 1)) / len(self.levels[levelnum][0]), 0))
 		print 'Square Count: %s' % len(self.levels[levelnum][0])
-		square_width = round((TOTAL_X - 75) / len(self.levels[levelnum][0]), 0)
-		square_height = round((TOTAL_Y - 75) / len(self.levels[levelnum]), 0)
+
+		self.square_width = round((TOTAL_X - (5 * self.num_squares - 1)) / len(self.levels[levelnum][0]), 0)
+		self.square_height = round((TOTAL_Y - (5 * self.num_squares - 1)) / len(self.levels[levelnum]), 0)
 		self.square_list = []
-		for y in range(len(self.levels[levelnum])):
-			#print 'length of self.levels[y] : ' + str(len(self.levels[levelnum][y]))
-			for x in range(len(self.levels[levelnum][y])):
+		for y in range(len(self.levels[levelnum])): #line in file
+			for x in range(len(self.levels[levelnum][y])): #each character in line y
 				self.color = self.color_map[self.levels[levelnum][y][x]]
 				self.square_list.append(Square(self, self.loc_x, self.loc_y, x, y, self.square_width, self.square_height, self.color))
-				self.loc_x += square_width + 5
+				self.loc_x += self.square_width + 5
 			self.loc_x = 5
-			self.loc_y += square_height + 5
+			self.loc_y += self.square_height + 5
 		self.loc_y = 10
-		
+
 
 	def update(self):
 		if not self.level_over:
@@ -104,8 +100,8 @@ class Board:
 			self.current_level += 1
 			try:
 				self.make_level(self.current_level)
-				self.square_width = round((TOTAL_X - 75) / len(self.levels[self.current_level][0]), 0)
-				self.square_height = round((TOTAL_Y - 75) / len(self.levels[self.current_level]), 0)
+				# self.square_width = round((TOTAL_X - (5 * self.num_squares - 1)) / len(self.levels[self.current_level][0]), 0)
+				# self.square_height = round((TOTAL_Y - (5 * self.num_squares - 1)) / len(self.levels[self.current_level]), 0)
 				p.move_to(0, 0)
 				print 'Player Width from %s to %s' % (p.width, square_width)
 				# square_width = round((TOTAL_X - 75) / len(self.levels[levelnum][0]), 0)
@@ -115,8 +111,15 @@ class Board:
 			except:
 				print 'Winner!!'
 				print 'Total Time: %s seconds.' % display_time
-				self.make_level(self.current_level - 1)
-				p.move_to(0,0)
+				done = True
+				sys.exit()
+				# self.current_level -= 1
+				# self.make_level(self.current_level)
+				# # self.square_width = round((TOTAL_X - (5 * self.num_squares - 1)) / len(self.levels[self.current_level][0]), 0)
+				# # self.square_height = round((TOTAL_Y - (5 * self.num_squares - 1)) / len(self.levels[self.current_level]), 0)
+				# p.move_to(0,0)
+				# p.width = self.square_width
+				# p.height = self.square_height
 
 class Square:
 	def __init__(self, board, x, y, x_count, y_count, width, height, color):
@@ -142,14 +145,14 @@ class Player(Square):
 		self.move(x_count, y_count)
 		self.width = width
 		self.height = height
-		
+
 		self.color = color
 		#print 'Square at (x, y): (' + str(self.x) + ', ' + str(self.y) + ')'
 		self.move_to(0, 0)
 	def move(self, move_x, move_y):
 		# print 'Player is at square x: %s, y: %s and ' %(self.x_count, self.y_count)
 		# print 'is moving to square x: %s, y: %s' % (self.x_count + move_x, self.y_count + move_y)
-		if self.valid_move(self.x_count + move_x, self.y_count + move_y):	
+		if self.valid_move(self.x_count + move_x, self.y_count + move_y):
 			self.x_count = self.x_count + move_x
 			self.y_count = self.y_count + move_y
 			dest = self.find_square(self.x_count, self.y_count)
@@ -181,19 +184,19 @@ class Player(Square):
 		if current:
 			if current.color == RED:
 				print 'Level Complete!'
-				print 
+				print
 				print
 				board.level_over = True
-		
+
 		pygame.draw.rect(screen, self.color, [self.x, self.y, self.width, self.height])
-		
+
 
 board = Board(levels)
 pygame.display.flip()
 board.make_level(0)
-square_width = round((TOTAL_X - 75) / len(board.levels[board.current_level][0]), 0)
-square_height = round((TOTAL_Y - 75) / len(board.levels[board.current_level]), 0)
-p = Player(board, 5, 5, 0, 0, square_width, square_height, WHITE)
+# square_width = round((TOTAL_X - 75) / len(board.levels[board.current_level][0]), 0)
+# square_height = round((TOTAL_Y - 75) / len(board.levels[board.current_level]), 0)
+p = Player(board, 5, 5, 0, 0, board.square_width, board.square_height, WHITE)
 
 total_time = 0
 
@@ -220,13 +223,13 @@ while not done:
 
 	total_time += clock.get_time()
 
-	display_time = int(total_time / 1000)-1767859
+	display_time = int(total_time / 1000)
 	msg = 'Total Time: %s' % display_time
 
 	fontObj = pygame.font.Font(None, 32)
 	msgSurfaceObj = fontObj.render(msg, True, WHITE)
 	msgRectObj = msgSurfaceObj.get_rect()
-	msgRectObj.topleft = (10, TOTAL_Y - 30)
+	msgRectObj.topleft = (10, TOTAL_Y + 50 - 30)
 	screen.blit(msgSurfaceObj, msgRectObj)
 
 
@@ -236,5 +239,5 @@ while not done:
 
 
 	clock.tick(60)
-	
+
 pygame.quit()
