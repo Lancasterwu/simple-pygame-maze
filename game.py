@@ -37,8 +37,9 @@ level4 = load_level('level4.txt')
 level5 = load_level('level5.txt')
 level6 = load_level('level6.txt')
 level7 = load_level('level7.txt')
+level8 = load_level('level8.txt')
 
-levels = [level0, level1, level2, level3, level4, level5, level6, level7]
+levels = [level0, level1, level2, level3, level4, level5, level6, level7, level8]
 loc_x = 5
 loc_y = 10
 
@@ -59,23 +60,11 @@ class Board:
 		self.loc_y = 10
 		self.level_over = False
 		self.current_level = 0
-		self.square_width = round((TOTAL_X - 75) / len(self.levels[self.current_level][0]), 0)
-		self.square_height = round((TOTAL_Y - 75) / len(self.levels[self.current_level]), 0)
-
+		self.square_width = 0
+		self.square_height = 0
 		print 'Board Created'
-		# for row in self.levels:
-		# 	print row
 	def make_level(self, levelnum):
-		#print 'length of self.levels : ' + str(len(self.levels[0]))
-
 		self.num_squares = len(self.levels[levelnum][0])
-		print 'Length of width: %s' % len(self.levels[levelnum][0])
-		print 'Length of height?: %s ' % len(self.levels[levelnum])
-		print '%s -- Total X' % TOTAL_X
-		print '%s -- Total X - 75' % (TOTAL_X - (5 * self.num_squares - 1))
-		print '/ %s -- Divided by # of squares in a row' % (len(self.levels[levelnum][0]))
-		print 'Square Width: %s' % str(round((TOTAL_X - (5 * self.num_squares - 1)) / len(self.levels[levelnum][0]), 0))
-		print 'Square Count: %s' % len(self.levels[levelnum][0])
 
 		self.square_width = round((TOTAL_X - (5 * self.num_squares - 1)) / len(self.levels[levelnum][0]), 0)
 		self.square_height = round((TOTAL_Y - (5 * self.num_squares - 1)) / len(self.levels[levelnum]), 0)
@@ -88,8 +77,6 @@ class Board:
 			self.loc_x = 5
 			self.loc_y += self.square_height + 5
 		self.loc_y = 10
-
-
 	def update(self):
 		if not self.level_over:
 			for square in self.square_list:
@@ -100,12 +87,8 @@ class Board:
 			self.current_level += 1
 			try:
 				self.make_level(self.current_level)
-				# self.square_width = round((TOTAL_X - (5 * self.num_squares - 1)) / len(self.levels[self.current_level][0]), 0)
-				# self.square_height = round((TOTAL_Y - (5 * self.num_squares - 1)) / len(self.levels[self.current_level]), 0)
 				p.move_to(0, 0)
 				print 'Player Width from %s to %s' % (p.width, square_width)
-				# square_width = round((TOTAL_X - 75) / len(self.levels[levelnum][0]), 0)
-				# square_height = round((TOTAL_Y - 75) / len(self.levels[levelnum]), 0)
 				p.width = self.square_width
 				p.height = self.square_height
 			except:
@@ -113,14 +96,6 @@ class Board:
 				print 'Total Time: %s seconds.' % display_time
 				done = True
 				sys.exit()
-				# self.current_level -= 1
-				# self.make_level(self.current_level)
-				# # self.square_width = round((TOTAL_X - (5 * self.num_squares - 1)) / len(self.levels[self.current_level][0]), 0)
-				# # self.square_height = round((TOTAL_Y - (5 * self.num_squares - 1)) / len(self.levels[self.current_level]), 0)
-				# p.move_to(0,0)
-				# p.width = self.square_width
-				# p.height = self.square_height
-
 class Square:
 	def __init__(self, board, x, y, x_count, y_count, width, height, color):
 		self.x = x
@@ -145,13 +120,10 @@ class Player(Square):
 		self.move(x_count, y_count)
 		self.width = width
 		self.height = height
-
 		self.color = color
-		#print 'Square at (x, y): (' + str(self.x) + ', ' + str(self.y) + ')'
 		self.move_to(0, 0)
 	def move(self, move_x, move_y):
-		# print 'Player is at square x: %s, y: %s and ' %(self.x_count, self.y_count)
-		# print 'is moving to square x: %s, y: %s' % (self.x_count + move_x, self.y_count + move_y)
+		"""Moves player the number of squares passed, if the move is valid"""
 		if self.valid_move(self.x_count + move_x, self.y_count + move_y):
 			self.x_count = self.x_count + move_x
 			self.y_count = self.y_count + move_y
@@ -160,6 +132,7 @@ class Player(Square):
 				self.x = dest.x
 				self.y = dest.y
 	def move_to(self, x, y):
+		"""Moves player to the specified x, y coordinates of the board, if the move is valid"""
 		dest = self.find_square(x, y)
 		if dest:
 			self.x = dest.x
@@ -167,6 +140,7 @@ class Player(Square):
 			self.x_count = x
 			self.y_count = y
 	def valid_move(self, move_x, move_y):
+		"""Returns True/False based on if the square is valid or not"""
 		dest_square = self.find_square(move_x, move_y)
 		if dest_square:
 			if dest_square.color <> BLUE and dest_square.x_count >= 0:# and dest_square.x_count < len(dest_square.board.levels[0]):
@@ -176,6 +150,7 @@ class Player(Square):
 		else:
 			return False
 	def find_square(self, x, y):
+		"""Given an x and y coordinate, returns the square on the board that matches that position. Nothing returned if not found"""
 		for square in board.square_list:
 			if square.x_count == x and square.y_count == y:
 				return square
@@ -189,24 +164,18 @@ class Player(Square):
 				board.level_over = True
 
 		pygame.draw.rect(screen, self.color, [self.x, self.y, self.width, self.height])
-
-
 board = Board(levels)
 pygame.display.flip()
 board.make_level(0)
-# square_width = round((TOTAL_X - 75) / len(board.levels[board.current_level][0]), 0)
-# square_height = round((TOTAL_Y - 75) / len(board.levels[board.current_level]), 0)
 p = Player(board, 5, 5, 0, 0, board.square_width, board.square_height, WHITE)
 
-total_time = 0
+start_time = pygame.time.get_ticks()
 
 # MAIN GAME LOOP
 while not done:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			done = True
-		# if event.type == KEYDOWN and event.key == K_DOWN:
-		# 	debug()
 		if event.type == KEYDOWN and event.key == K_DOWN:
 			p.move(0, 1)
 		if event.type == KEYDOWN and event.key == K_UP:
@@ -221,9 +190,9 @@ while not done:
 	# Reset the screen
 	screen.fill(BLACK)
 
-	total_time += clock.get_time()
+	current_time = pygame.time.get_ticks()
 
-	display_time = int(total_time / 1000)
+	display_time = int((current_time - start_time)/1000)
 	msg = 'Total Time: %s' % display_time
 
 	fontObj = pygame.font.Font(None, 32)
