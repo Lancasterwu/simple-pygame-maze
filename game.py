@@ -1,5 +1,6 @@
 import pygame
 import sys
+from PIL import Image
 from pygame.locals import *
 pygame.init()
 ## TODO ###
@@ -14,6 +15,11 @@ WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
+
+R_MODIFIER = .90
+G_MODIFER = .90
+B_MODIFIER = .90
+
 TOTAL_X = 800
 TOTAL_Y = 600
 SIZE = (TOTAL_X+50, TOTAL_Y+50)
@@ -51,6 +57,11 @@ clock = pygame.time.Clock()
 square_width = 45
 square_height = 45
 
+
+
+
+#sprite_img = pygame.image.load('player.png')
+
 class Board:
 	def __init__(self, levels):
 		self.levels = levels
@@ -64,18 +75,33 @@ class Board:
 		self.square_height = 0
 		print 'Board Created'
 	def make_level(self, levelnum):
-		self.num_squares = len(self.levels[levelnum][0])
 
-		self.square_width = round((TOTAL_X - (5 * self.num_squares - 1)) / len(self.levels[levelnum][0]), 0)
-		self.square_height = round((TOTAL_Y - (5 * self.num_squares - 1)) / len(self.levels[levelnum]), 0)
+		self.num_squares = len(self.levels[levelnum][0])
+		self.square_width = (TOTAL_X - (self.num_squares)) / len(self.levels[levelnum][0])
+		self.square_height = (TOTAL_Y - (self.num_squares)) / len(self.levels[levelnum])
+
+		img_size = (self.square_width, self.square_height)
+		
+		if levelnum == 0:
+			img = Image.open('player.png')
+		else:
+			img = Image.open('sprite.png')
+		print img.size
+		img.thumbnail(img_size, Image.ANTIALIAS)
+		print img.size
+		img.save('sprite.png')
+
+		# self.square_width = round((TOTAL_X - (2 * self.num_squares - 1)) / len(self.levels[levelnum][0]), 0)
+		# self.square_height = round((TOTAL_Y - (2 * self.num_squares - 1)) / len(self.levels[levelnum]), 0)
 		self.square_list = []
 		for y in range(len(self.levels[levelnum])): #line in file
 			for x in range(len(self.levels[levelnum][y])): #each character in line y
 				self.color = self.color_map[self.levels[levelnum][y][x]]
-				self.square_list.append(Square(self, self.loc_x, self.loc_y, x, y, self.square_width, self.square_height, self.color))
-				self.loc_x += self.square_width + 5
+				self.square_list.append(Square(self, self.loc_x, self.loc_y, x, y, 
+					self.square_width, self.square_height, self.color))
+				self.loc_x += self.square_width + 2
 			self.loc_x = 5
-			self.loc_y += self.square_height + 5
+			self.loc_y += self.square_height + 2
 		self.loc_y = 10
 	def update(self):
 		if not self.level_over:
@@ -110,6 +136,7 @@ class Square:
 		return square.color <> 'BLUE'
 	def update(self):
 		pygame.draw.rect(screen, self.color, [self.x, self.y, self.width, self.height])
+		
 
 class Player(Square):
 	def __init__(self, board, x, y, x_count, y_count, width, height, color):
@@ -132,7 +159,8 @@ class Player(Square):
 				self.x = dest.x
 				self.y = dest.y
 	def move_to(self, x, y):
-		"""Moves player to the specified x, y coordinates of the board, if the move is valid"""
+		"""Moves player to the specified x, y coordinates of the board, 
+		if the move is valid"""
 		dest = self.find_square(x, y)
 		if dest:
 			self.x = dest.x
@@ -143,18 +171,21 @@ class Player(Square):
 		"""Returns True/False based on if the square is valid or not"""
 		dest_square = self.find_square(move_x, move_y)
 		if dest_square:
-			if dest_square.color <> BLUE and dest_square.x_count >= 0:# and dest_square.x_count < len(dest_square.board.levels[0]):
+			if dest_square.color <> BLUE and dest_square.x_count >= 0:
+			# and dest_square.x_count < len(dest_square.board.levels[0]):
 				return True
 			else:
 				return False
 		else:
 			return False
 	def find_square(self, x, y):
-		"""Given an x and y coordinate, returns the square on the board that matches that position. Nothing returned if not found"""
+		"""Given an x and y coordinate, returns the square on the board that matches 
+		that position. Nothing returned if not found"""
 		for square in board.square_list:
 			if square.x_count == x and square.y_count == y:
 				return square
 	def update(self):
+		#sprite_img = pygame.image.load('player.png')
 		current = self.find_square(self.x_count, self.y_count)
 		if current:
 			if current.color == RED:
@@ -164,6 +195,7 @@ class Player(Square):
 				board.level_over = True
 
 		pygame.draw.rect(screen, self.color, [self.x, self.y, self.width, self.height])
+		#screen.blit(sprite_img, (self.x, self.y))
 board = Board(levels)
 pygame.display.flip()
 board.make_level(0)
@@ -186,7 +218,12 @@ while not done:
 			p.move(1, 0)
 		if event.type == KEYDOWN and event.key == K_l:
 			board.level_over = True
-
+	try:
+		if display_time > 3:
+			for square in board.square_list:
+				square.color = square.color * (R_MODIFIER, G_MODIFIER, B_MODIFIER)
+	except:
+		print 'error'
 	# Reset the screen
 	screen.fill(BLACK)
 
