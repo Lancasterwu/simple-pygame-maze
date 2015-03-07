@@ -44,8 +44,12 @@ level5 = load_level('level5.txt')
 level6 = load_level('level6.txt')
 level7 = load_level('level7.txt')
 level8 = load_level('level8.txt')
+level9 = load_level('level9.txt')
+level10 = load_level('level10.txt')
+level11 = load_level('level11.txt')
 
-levels = [level0, level1, level2, level3, level4, level5, level6, level7, level8]
+# levels = [level0, level1, level2, level3, level4, level5, level6, level7, level8, level9, level10]
+levels = [level11]
 loc_x = 5
 loc_y = 10
 
@@ -223,7 +227,8 @@ while not done:
 			for square in board.square_list:
 				square.color = square.color * (R_MODIFIER, G_MODIFIER, B_MODIFIER)
 	except:
-		print 'error'
+		#print 'error'
+		pass
 	# Reset the screen
 	screen.fill(BLACK)
 
