@@ -86,16 +86,16 @@ class Board:
 		self.square_width = (TOTAL_X - (self.num_squares)) / len(self.levels[levelnum][0])
 		self.square_height = (TOTAL_Y - (self.num_squares)) / len(self.levels[levelnum])
 
-		img_size = (self.square_width, self.square_height)
+		# img_size = (self.square_width, self.square_height)
 		
-		if levelnum == 0:
-			img = Image.open('player.png')
-		else:
-			img = Image.open('sprite.png')
-		print img.size
-		img.thumbnail(img_size, Image.ANTIALIAS)
-		print img.size
-		img.save('sprite.png')
+		# if levelnum == 0:
+		# 	img = Image.open('player.png')
+		# else:
+		# 	img = Image.open('sprite.png')
+		# print img.size
+		# img.thumbnail(img_size, Image.ANTIALIAS)
+		# print img.size
+		# img.save('sprite.png')
 
 		# self.square_width = round((TOTAL_X - (2 * self.num_squares - 1)) / len(self.levels[levelnum][0]), 0)
 		# self.square_height = round((TOTAL_Y - (2 * self.num_squares - 1)) / len(self.levels[levelnum]), 0)
