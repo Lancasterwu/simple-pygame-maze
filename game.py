@@ -47,9 +47,11 @@ level8 = load_level('level8.txt')
 level9 = load_level('level9.txt')
 level10 = load_level('level10.txt')
 level11 = load_level('level11.txt')
-
-# levels = [level0, level1, level2, level3, level4, level5, level6, level7, level8, level9, level10]
-levels = [level11]
+level12 = load_level('level12.txt')
+level13 = load_level('level13.txt')
+level14 = load_level('level14.txt')
+levels = [level0, level1, level2, level3, level4, level5, level6, level7, level8, level9, level10, level11, level12, level13, level14]
+#levels = [level14]
 loc_x = 5
 loc_y = 10
 
